@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 import styles from './Card.module.styl'
 import * as actions from '../actions'
 import { getBoard, getCard } from '../selectors'
+import ReactModal from 'react-modal'
 
 import { DragSource } from 'react-dnd'
 import constants from '../constants'
@@ -27,11 +28,28 @@ const collectDrag = (connect, monitor) => {
 }
 
 class Card extends Component {
+  constructor(){
+    super()
+    this.state = {
+      showModal: false
+    }
+    this.handleOpenModal = this.handleOpenModal.bind(this)
+    this.handleCloseModal = this.handleCloseModal.bind(this)
+  }
+
   static propTypes = {
     listId: PropTypes.string.isRequired,
     cardId: PropTypes.string.isRequired,
     connectDragSource: PropTypes.func.isRequired,
     isDragging: PropTypes.bool.isRequired
+  }
+
+  handleOpenModal = () => {
+    this.setState({ showModal: true })
+  }
+  
+  handleCloseModal = () => {
+    this.setState({ showModal: false })
   }
 
   canDelete = () => {
@@ -50,9 +68,17 @@ class Card extends Component {
     const className = isDragging ? styles.draggingCard : styles.card
     return connectDragSource(
       <div className={className}>
-        <div className={styles.header}>
+        <div onClick={this.handleOpenModal} className={styles.header}>
           {this.props.card.title}
         </div>
+
+        <ReactModal 
+           isOpen={this.state.showModal}
+           contentLabel="Minimal Modal Example"
+        >
+          <button onClick={this.handleCloseModal}>Close Modal</button>
+        </ReactModal>
+
         <div className={styles.buttons}>
           <a className={styles.removeCard} role="button" onClick={this.removeCard}>✖</a>
         </div>
